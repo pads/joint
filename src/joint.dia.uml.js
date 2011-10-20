@@ -81,7 +81,7 @@ uml.arrow = {
  * @param {Number} [properties.swimlaneOffsetY] Offset in y-axis of the swimlane shown after the state label.
  * @param {Object} [properties.attrs] SVG attributes of the appearance of the state.
  * @param {Object} [properties.actions] Actions of the state.
- * @param {String} [properties.actions.label] Custom label within the actions of the state.
+ * @param {array} [properties.actions.labels] Custom labels within the actions of the state (e.g. ["label1", "label2"]).
  * @param {String} [properties.actions.entry] Entry action of the state.
  * @param {String} [properties.actions.exit] Exit action of the state.
  * @param {array} [properties.actions.inner] Actions of the state (e.g. ["Evt1", "Action1()", "Evt2", "Action2()"])
@@ -95,7 +95,7 @@ var s1 = Joint.dia.uml.State.create({
     fill: "90-#000-green:1-#fff"
   },
   actions: {
-    label: "action label",
+    labels: ["label1", "label2"],
     entry: "init()",
     exit: "destroy()",
     inner: ["Evt1", "foo()", "Evt2", "bar()"]
@@ -115,7 +115,7 @@ uml.State = Element.extend({
             labelOffsetY: 5,
             swimlaneOffsetY: 18,
             actions: {
-                label: "",
+                labels: [],
                 entry: "",
                 exit: "",
                 inner: []
@@ -147,7 +147,11 @@ uml.State = Element.extend({
     getActionsElement: function(){
 	// collect all actions
 	var p = this.properties;
-	var str = (p.actions.label != "") ? p.actions.label + "\n" : "";
+	var len = p.actions.labels.length;
+	var str = "";
+	for(var index = 0; index < len; index++) {
+    	str += p.actions.labels[index] + "\n";
+	}
 	str += (p.actions.entry != "") ? "entry/ " + p.actions.entry + "\n" : "";
 	str += (p.actions.exit != "") ? "exit/ " + p.actions.exit + "\n" : "";
 	var l = p.actions.inner.length;
