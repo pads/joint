@@ -142,7 +142,7 @@ uml.State = Element.extend({
             var xScale = xGrowth / this.originalX;
             var yScale = yGrowth / this.originalY;
             //TODO: scale from last scale if resizing more than once
-            wholeShape.scale(this.box.lastXScale + xScale, this.box.lastYScale + yScale);
+            wholeShape.scale(xScale, yScale);
             this.attr({x: wrapperAttrs.x + wrapperAttrs.width - 10, y: wrapperAttrs.y + wrapperAttrs.height - 10});
 
         };
