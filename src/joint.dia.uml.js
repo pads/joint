@@ -107,43 +107,51 @@ uml.State = Element.extend({
     module: "uml",
     init: function(properties){
 	// options
-        var p = Joint.DeepSupplement(this.properties, properties, {
-            radius: 15,
-            attrs: { fill: 'white' },
-            label: '',
-            labelOffsetX: 20,
-            labelOffsetY: 5,
-            swimlaneOffsetY: 18,
-            actions: {
-                labels: [],
-                entry: "",
-                exit: "",
-                inner: []
-            },
-            actionsOffsetX: 5,
-            actionsOffsetY: 5
-        });
+    var p = Joint.DeepSupplement(this.properties, properties, {
+        radius: 15,
+        attrs: { fill: 'white' },
+        label: '',
+        labelOffsetX: 20,
+        labelOffsetY: 5,
+        swimlaneOffsetY: 18,
+        actions: {
+            labels: [],
+            entry: "",
+            exit: "",
+            inner: []
+        },
+        actionsOffsetX: 5,
+        actionsOffsetY: 5
+    });
     var box = this.paper.rect(p.rect.x, p.rect.y, p.rect.width, p.rect.height, p.radius).attr(p.attrs);
-    // Small inner box to be the handle for resizing
-    var resizeHandle = this.paper.rect(p.rect.x + p.rect.width - 10, p.rect.y + p.rect.height - 10, 10, 10, p.radius).attr({fill: 'white'});
-    box.resizeHandle = resizeHandle;
-    var resizeStart = function () {
-        this.originalX = this.attr("x");
-        this.originalY = this.attr("y");
-        this.box.originalX = this.box.attr("width");
-        this.box.originalY = this.box.attr("height");
-    };
-    var resizeMove = function (drawnX, drawnY) {
-        var xGrowth = this.originalX + drawnX;
-        var yGrowth = this.originalY + drawnY;
-        var xScale = xGrowth / this.originalX;
-        var yScale = yGrowth / this.originalY;
-        this.box.wholeShape.scale(xScale, yScale);
-        //TODO: fix
-        this.attr({x: this.originalX + drawnX, y: this.originalY + drawnY});
-    };
-    resizeHandle.box = box;
-    resizeHandle.drag(resizeMove, resizeStart);
+    if(this.properties.resizable) {
+        // handle for resizing
+        var resizeHandle = this.paper.rect(p.rect.x + p.rect.width - 10, p.rect.y + p.rect.height - 10, 10, 10, p.radius).attr({fill: 'white'});
+        box.resizeHandle = resizeHandle;
+        var resizeStart = function(){
+            this.originalX = this.attr("x");
+            this.originalY = this.attr("y");
+            this.box.originalX = this.box.attr("width");
+            this.box.originalY = this.box.attr("height");
+        };
+        var resizeMove = function(drawnX, drawnY){
+            var wholeShape = this.box.wholeShape;
+            var wrapperAttrs = wholeShape.wrapper.attrs;
+            var xGrowth = this.originalX + drawnX;
+            var yGrowth = this.originalY + drawnY;
+            var xScale = xGrowth / this.originalX;
+            var yScale = yGrowth / this.originalY;
+            //TODO: scale from last scale if resizing more than once
+            wholeShape.scale(this.box.lastXScale + xScale, this.box.lastYScale + yScale);
+            this.attr({x: wrapperAttrs.x + wrapperAttrs.width - 10, y: wrapperAttrs.y + wrapperAttrs.height - 10});
+
+        };
+        var resizeFinish = function(){
+            //TODO: capture current scale
+        }
+        resizeHandle.box = box;
+        resizeHandle.drag(resizeMove, resizeStart, resizeFinish);
+    }
 	// wrapper
 	this.setWrapper(box);
 	// inner

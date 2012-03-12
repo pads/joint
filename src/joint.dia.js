@@ -774,13 +774,15 @@ Element.prototype = {
 	this.shadow && this.shadow.scale.apply(this.shadow, arguments);
 	this.wrapper.scale.apply(this.wrapper, arguments);
 	this.zoom.apply(this, arguments);
-	// apply scale to all subshapes that are Elements (were embeded)
-	for (var i = 0, len = this.inner.length; i < len; i++){
-	    var inner = this.inner[i];
-	    if (inner._isElement){
-		inner.scale.apply(inner, arguments);
-	    }
-	}
+    // apply scale to all subshapes that are Elements (were embeded) unless resizing - not always desirable
+    if(!this.properties.resizable) {
+        for (var i = 0, len = this.inner.length; i < len; i++){
+            var inner = this.inner[i];
+            if (inner._isElement){
+            inner.scale.apply(inner, arguments);
+            }
+        }
+    }
 	if (this._doNotRedrawToolbox) return;
 	this.removeToolbox();
 	this.addToolbox();
@@ -919,9 +921,12 @@ Joint.addEvent(document, "mousemove", Element.mouseMove);
 Joint.addEvent(document, "mouseup", Element.mouseUp);
 
 function setResizeHandleCoordinates() {
-    if(dia._currentDrag.wrapper !== undefined) {
-        dia._currentDrag.wrapper.resizeHandle.attr({x: dia._currentDrag.wrapper.attrs.x + dia._currentDrag.wrapper.attrs.width - 10, y: dia._currentDrag.wrapper.attrs.y + dia._currentDrag.wrapper.attrs.height - 10});
-        dia._currentDrag.wrapper.resizeHandle.toFront();
+    var wrapper = dia._currentDrag.wrapper;
+    if(wrapper !== undefined && wrapper.resizeHandle !== undefined) {
+        var resizeHandle = wrapper.resizeHandle;
+        var wrapperAttrs = wrapper.attrs;
+        resizeHandle.attr({x: wrapperAttrs.x + wrapperAttrs.width - 10, y: wrapperAttrs.y + wrapperAttrs.height - 10});
+        resizeHandle.toFront();
     }
 }
 
