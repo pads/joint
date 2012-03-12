@@ -123,8 +123,29 @@ uml.State = Element.extend({
             actionsOffsetX: 5,
             actionsOffsetY: 5
         });
+    var box = this.paper.rect(p.rect.x, p.rect.y, p.rect.width, p.rect.height, p.radius).attr(p.attrs);
+    // Small inner box to be the handle for resizing
+    var resizeHandle = this.paper.rect(p.rect.x + p.rect.width - 10, p.rect.y + p.rect.height - 10, 10, 10, p.radius).attr({fill: 'white'});
+    box.resizeHandle = resizeHandle;
+    var resizeStart = function () {
+        this.originalX = this.attr("x");
+        this.originalY = this.attr("y");
+        this.box.originalX = this.box.attr("width");
+        this.box.originalY = this.box.attr("height");
+    };
+    var resizeMove = function (drawnX, drawnY) {
+        var xGrowth = this.originalX + drawnX;
+        var yGrowth = this.originalY + drawnY;
+        var xScale = xGrowth / this.originalX;
+        var yScale = yGrowth / this.originalY;
+        this.box.wholeShape.scale(xScale, yScale);
+        //TODO: fix
+        this.attr({x: this.originalX + drawnX, y: this.originalY + drawnY});
+    };
+    resizeHandle.box = box;
+    resizeHandle.drag(resizeMove, resizeStart);
 	// wrapper
-	this.setWrapper(this.paper.rect(p.rect.x, p.rect.y, p.rect.width, p.rect.height, p.radius).attr(p.attrs));
+	this.setWrapper(box);
 	// inner
 	this.addInner(this.getLabelElement());
 	this.addInner(this.getSwimlaneElement());

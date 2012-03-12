@@ -395,6 +395,9 @@ Element.prototype = {
 
 	dia._currentDrag.dx = e.clientX;
 	dia._currentDrag.dy = e.clientY;
+
+    setResizeHandleCoordinates();
+
 	e.preventDefault && e.preventDefault();
     },
 
@@ -837,6 +840,9 @@ Element.mouseMove = function(e){
 
 	dia._currentDrag.dx = e.clientX;
 	dia._currentDrag.dy = e.clientY;
+
+    setResizeHandleCoordinates();
+
     }
 
     // object zooming
@@ -903,6 +909,8 @@ Element.mouseUp = function(e){
 	dia._currentZoom.toFront();
     }
 
+    setResizeHandleCoordinates();
+
     dia._currentDrag = false;
     dia._currentZoom = false;
 };
@@ -910,5 +918,11 @@ Element.mouseUp = function(e){
 Joint.addEvent(document, "mousemove", Element.mouseMove);
 Joint.addEvent(document, "mouseup", Element.mouseUp);
 
+function setResizeHandleCoordinates() {
+    if(dia._currentDrag.wrapper !== undefined) {
+        dia._currentDrag.wrapper.resizeHandle.attr({x: dia._currentDrag.wrapper.attrs.x + dia._currentDrag.wrapper.attrs.width - 10, y: dia._currentDrag.wrapper.attrs.y + dia._currentDrag.wrapper.attrs.height - 10});
+        dia._currentDrag.wrapper.resizeHandle.toFront();
+    }
+}
 
 })(this);	// END CLOSURE
