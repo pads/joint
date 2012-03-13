@@ -126,31 +126,27 @@ uml.State = Element.extend({
     var box = this.paper.rect(p.rect.x, p.rect.y, p.rect.width, p.rect.height, p.radius).attr(p.attrs);
     if(this.properties.resizable) {
         // handle for resizing
-        var resizeHandle = this.paper.rect(p.rect.x + p.rect.width - 10, p.rect.y + p.rect.height - 10, 10, 10, p.radius).attr({fill: 'white'});
+        var resizeHandle = this.paper.rect(p.rect.x + p.rect.width - 10, p.rect.y + p.rect.height - 10, 10, 10).attr({fill: 'black', cursor: 'se-resize', 'fill-opacity': 1});
         box.resizeHandle = resizeHandle;
         var resizeStart = function(){
-            this.originalX = this.attr("x");
-            this.originalY = this.attr("y");
-            this.box.originalX = this.box.attr("width");
-            this.box.originalY = this.box.attr("height");
+            this.box.originalWidth = this.box.attr("width");
+            this.box.originalHeight = this.box.attr("height");
         };
         var resizeMove = function(drawnX, drawnY){
             var wholeShape = this.box.wholeShape;
             var wrapperAttrs = wholeShape.wrapper.attrs;
-            var xGrowth = this.originalX + drawnX;
-            var yGrowth = this.originalY + drawnY;
-            var xScale = xGrowth / this.originalX;
-            var yScale = yGrowth / this.originalY;
-            //TODO: scale from last scale if resizing more than once
-            wholeShape.scale(xScale, yScale);
+            var widthGrowth = this.box.originalWidth + drawnX;
+            var heightGrowth = this.box.originalHeight + drawnY;
+            wholeShape.attr({width: widthGrowth, height: heightGrowth});
+            if(wholeShape.shadow) {
+                wholeShape.shadow.attr({width: widthGrowth + 2, height: heightGrowth + 2});
+            }
+            wholeShape.zoom();
             this.attr({x: wrapperAttrs.x + wrapperAttrs.width - 10, y: wrapperAttrs.y + wrapperAttrs.height - 10});
 
         };
-        var resizeFinish = function(){
-            //TODO: capture current scale
-        }
         resizeHandle.box = box;
-        resizeHandle.drag(resizeMove, resizeStart, resizeFinish);
+        resizeHandle.drag(resizeMove, resizeStart);
     }
 	// wrapper
 	this.setWrapper(box);
